@@ -1,0 +1,46 @@
+defaults: 
+  - _self_
+  - trainer: base_trainer
+  - dataset: base_dataset
+  - prior_cost: base_convae_prior
+  - cost_functions: mse_costs
+
+datamodule: 
+  _target_: contrib.eeg.data.EsiDatamodule
+  dataset_kw: 
+    datafolder: ${dataset.datafolder}
+    simu_name: ${dataset.simu_name}
+    subject_name: ${dataset.subject_name}
+    source_sampling: ${dataset.source_sampling}
+    electrode_montage: ${dataset.electrode_montage}
+    orientation: ${dataset.orientation}
+    to_load: ${dataset.to_load}
+    snr_db: 5
+    noise_type: {"white":1.}
+    scaler_type: 'linear_bis'
+    replace_root: True
+  subset_name: "left_back"
+  dl_kw: 
+    batch_size: 32
+  time_window: False
+
+fwd: 
+  _target_: contrib.eeg.utils_eeg.load_fwd
+  datafolder: ${dataset.datafolder}
+  head_model_dict: 
+    subject_name: ${dataset.subject_name}
+    orientation: ${dataset.orientation}
+    electrode_montage: ${dataset.electrode_montage}
+    source_sampling: ${dataset.source_sampling}
+  fwd_name: 'fwd_ico3-fwd.fif'
+  scaler_type: ${datamodule.dataset_kw.scaler_type}
+
+obs_cost: 
+  _target_: contrib.eeg.solvers.EsiBaseObsCost
+  forward_obj: ${fwd}
+  cost_fn: ${cost_functions.obs_cost_fn}
+
+grad_mod:
+  _target_: contrib.eeg.grad_models.RearrangedConvLstmGradModel_n
+  dim_in: ${dataset.n_sources}
+  dim_hidden: 48

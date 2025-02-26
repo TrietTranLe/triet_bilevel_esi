@@ -1,0 +1,19 @@
+datafolder: '/home/triet/Documents/DATA'
+
+n_times: 64
+n_sources: 994 
+n_electrodes: 90
+
+#head model 
+subject_name: 'fsaverage'
+orientation: 'constrained'
+electrode_montage: 'standard_1020'
+source_sampling: 'fsav_994'
+
+# simulation
+simu_name: 'ses_sereega_fsav994_125ms'
+snr_db: 5
+noise_type: {"white":1.}
+replace_root: True
+
+to_load: 10000

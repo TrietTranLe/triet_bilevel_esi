@@ -1,0 +1,67 @@
+defaults: 
+  - _self_
+  - trainer: base_trainer
+  - dataset: ses_sereega_fsav994_125ms.yaml
+  - prior_cost: base_convae_prior
+  - cost_functions: cosine_costs
+
+datamodule: 
+  _target_: contrib.eeg.data.EsiDatamodule
+  dataset_kw: 
+    datafolder: ${dataset.datafolder}
+    simu_name: ${dataset.simu_name}
+    subject_name: ${dataset.subject_name}
+    source_sampling: ${dataset.source_sampling}
+    electrode_montage: ${dataset.electrode_montage}
+    orientation: ${dataset.orientation}
+    to_load: ${dataset.to_load}
+    snr_db: 5
+    noise_type: {"white":1.}
+    scaler_type: 'linear_bis'
+    replace_root: True
+  subset_name: "left_back"
+  dl_kw: 
+    batch_size: 32
+  time_window: False
+
+fwd: 
+  _target_: contrib.eeg.utils_eeg.load_fwd_fsav
+  datafolder: ${dataset.datafolder}
+  head_model_dict: 
+    subject_name: ${dataset.subject_name}
+    orientation: ${dataset.orientation}
+    electrode_montage: ${dataset.electrode_montage}
+    source_sampling: ${dataset.source_sampling}
+  fwd_name: 'fwd_fsav_994-fwd.fif'
+  scaler_type: ${datamodule.dataset_kw.scaler_type}
+
+obs_cost: 
+  _target_: contrib.eeg.solvers.EsiBaseObsCost
+  forward_obj: ${fwd}
+  cost_fn: ${cost_functions.obs_cost_fn}
+
+grad_mod:
+  _target_: contrib.eeg.grad_models.RearrangedConvLstmGradModel_s
+  dim_in: ${dataset.n_sources}
+  dim_hidden: 48
+
+litmodel:
+  _target_: contrib.eeg.solvers.EsiLitModule
+  solver:
+    _target_: contrib.eeg.solvers.EsiGradSolver_n
+
+    # cost_fn:
+    #   _target_: contrib.eeg.metric_learner.SiameseMetric
+
+    fwd: ${fwd}
+    n_step: 10
+    lr_grad: 1e-3
+    prior_cost: ${prior_cost}
+    obs_cost: ${obs_cost}
+    grad_mod: ${grad_mod}
+  opt_fn: 
+    _target_: contrib.eeg.optimizers.optim_adam_gradphi
+    _partial_: true
+    lr: 5e-5
+  loss_fn: ${cost_functions.train_cost_fn}
+  # noise_std: 0.01

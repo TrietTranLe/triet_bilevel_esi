@@ -1,0 +1,20 @@
+datafolder: '/home/reynaudsarah/Documents/Data/simulation'
+
+n_times: 128
+n_sources: 132
+n_electrodes: 65
+
+#head model 
+subject_name: 'fsaverage'
+orientation: 'constrained'
+electrode_montage: 'standard_alphabetic'
+source_sampling: 'oct3'
+
+# simulation
+simu_name: 'ses_oct3_stalpha'
+snr_db: 5
+noise_type: {"white":1.}
+# scaler_type: 'linear'
+replace_root: True
+
+to_load: 10000

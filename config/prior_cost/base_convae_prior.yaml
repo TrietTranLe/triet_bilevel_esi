@@ -1,0 +1,8 @@
+_target_: contrib.eeg.prior.ConvAEPrior
+dim_in: ${dataset.n_sources}
+dim_hidden: 128
+dim_out: ${dataset.n_sources}
+kernel_size: 1
+# pretrained_model_path: None
+fixed: false
+cost_fn: ${cost_functions.prior_cost_fn}
