@@ -1,11 +1,11 @@
-datafolder: '/home/triet/Documents/DATA'
+datafolder: '../data'
 
 n_times: 64
 n_sources: 994 
 n_electrodes: 90
 
 #head model 
-subject_name: 'fsaverage'
+subject_name: 'fsav_994'
 orientation: 'constrained'
 electrode_montage: 'standard_1020'
 source_sampling: 'fsav_994'
